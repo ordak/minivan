@@ -1,6 +1,7 @@
 # TOODO
 #  -> add "changed" flags for all UI fields, esp. accumulated
 #  -> make frontend pass button indeices not IDs
+#  -> make events nonconsumable
 
 import queue
 import time
@@ -27,20 +28,20 @@ the_button_push_queue = queue.Queue()
 
 _DUMB_TEST = False
 _SEQUENTIAL_TEST = False
-_PREQUEUE_TEST = True
+_PREQUEUE_TEST = False
 
 
 class MainViewHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("template_spa.html")
+        self.render("main.html")
 
 class SensorsViewHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("template_spa.html")
+        self.render("sensors.html")
 
 class InputOnlyViewHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("template_spa.html")
+        self.render("input_only.html")
 
 class GetButtonFunctionsHandler(tornado.web.RequestHandler):
     def get(self):
