@@ -1,0 +1,197 @@
+<HTML>
+    <head>
+        <script src="content/jquery-3.6.0.min.js"></script>
+    <script>
+$(document).ready(function(){
+
+    fancizeSpace = function(c) { return c == ' ' ? '□ ' : c; };
+    crankUpAndDomizeColor = function(baseColor, crankFactor) {
+        overflowFactor = crankFactor > 1 ? crankFactor - 1 : 0;
+        overflowFactor = crankFactor;
+        return "rgb(" + (baseColor[0] * crankFactor + overflowFactor * 40) + 
+                  "," + (baseColor[1] * crankFactor + overflowFactor * 40) + 
+                  "," + (baseColor[2] * crankFactor + overflowFactor * 40) + 
+                  ")";
+    }
+
+    $.get('/getButtonFunctions', (data) => {
+        data = JSON.parse(data);
+        console.log(data);
+        for (const [ei, ch] of Object.entries(data)) {
+            $("#event_" + ei).text(ch);
+        };
+    });
+
+    $(".event_indicator").click( function(e) {
+        element = $(this);
+        if (e.shiftKey) {  // shift click
+            console.log(e);
+            let element = $(this);
+            console.log(element.attr("id"));
+            $.post("/cycleButtonFunction",
+            { "event_index": element.attr("id").replaceAll(/^event_/g, "") }
+            ).done(function(result) {
+                // data = JSON.parse(result);
+                console.log(result);
+                element.text(result); });
+        } else {
+            $.post("/forceButtonAction",
+            { "event_index": element.attr("id").replaceAll(/^event_/g, "") }
+            );
+        }
+    });
+
+    $(".large_letter").click( () => {
+        $(".large_letter").text("X");
+    });
+
+    var eventIndicatorIntensities = [1.0, 1.0, 1.0, 1.0];
+    var eventIndicatorColors = [
+       [255, 0, 0], [255, 255, 0], [0, 180, 0], [0, 0, 255]];
+
+    var synchroCounter = 1;
+    var synchroPeriod = 3;
+    setInterval(() => {
+        if (++synchroCounter >= synchroPeriod) {
+            synchroCounter = 0;
+            $.get('/events', (data) => {
+                data = JSON.parse(data);
+                //console.log(data);
+                data.events.forEach( (ei) => {
+                    console.log("Event " + ei);
+                    // ei - 1 since events are 1-based
+                    eventIndicatorIntensities[ei - 1] = 1.5; });
+                $(".large_letter").text(fancizeSpace(data.center_letter));
+                $(".small_letter#L1").text(fancizeSpace(data.left_letters[0]));
+                $(".small_letter#L2").text(fancizeSpace(data.left_letters[1]));
+                $(".small_letter#R1").text(fancizeSpace(data.right_letters[0]));
+                $(".small_letter#R2").text(fancizeSpace(data.right_letters[1]));
+                $(".accumulated_output_text").text(data.accumulated + "▒");
+                $(".accumulated_output_container").scrollTop(
+                    $(".accumulated_output_text").height());
+            });
+        }
+        eventIndicatorIntensities.forEach(  function(e, i, a) {
+            a[i] = Math.max(0.4, e * 0.95)
+        });
+        $(".event_indicator").each(function(ei, e) {
+            e.style.background = crankUpAndDomizeColor(
+                eventIndicatorColors[ei], eventIndicatorIntensities[ei]);
+        });
+    }, 50);
+
+}); 
+        </script>
+
+        <style>
+* {
+    font-family: Monospace;
+}
+.navbar {
+    height: 5%;
+    float: top;
+    background-color: cyan;
+}
+.main_operating_area {
+    float: bottom;
+    background-color: green;
+}
+.output_area {
+    background-color: lightgray;
+    width: 80%;
+    float: left;
+}
+.current_output {
+    height: 40%;
+    float: top;
+    background-color: lightblue;
+}
+.small_letter {
+    display: inline-block;
+    font-size: 20em;
+    color: rgba(255, 0, 0, 0.4);
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+}
+.large_letter {
+    color: rgba(255, 0, 0, 1.0);
+    display: inline-block;
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    font-size: 32em;
+}
+.accumulated_output_container {
+    overflow-y: scroll;
+    height: 50%;
+    float: bottom;
+}
+.accumulated_output_text {
+    overflow-y: scroll;
+    float: bottom;
+    font-size: 16em;
+    background-color: darkgray;
+    margin-top: 0.2em;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.event_indicators_panel {
+    width: 20%;
+    float: right;
+}
+.event_indicator {
+    text-align: center;
+    font-size: 14em;
+    font-weight: bold;
+    padding: 0.05em;
+    margin: 0.05em;
+}
+#event_1 {
+    background-color: red;
+}
+#event_2 {
+    background-color: yellow;
+}
+#event_3 {
+    background-color: #00FF00;
+}
+#event_4 {
+    background-color: blue;
+}
+        </style>
+    </head><body>
+        <div class="navbar">
+        </div>
+        <div class="main_operating_area">
+            <div class="event_indicators_panel">
+                <div class="event_indicator" id="event_1">
+                    1
+                </div>
+                <div class="event_indicator" id="event_2">
+                    2
+                </div>
+                <div class="event_indicator" id="event_3">
+                    3
+                </div>
+                <div class="event_indicator" id="event_4">
+                    4
+                </div>
+            </div>
+            <div class="output_area">
+                <div class="current_output">
+                    <div class="small_letter" id="L1">A</div>
+                    <div class="small_letter" id="L2">B</div>
+                    <div class="large_letter">C</div>
+                    <div class="small_letter" id="R1">D</div>
+                    <div class="small_letter" id="R2">E</div>
+                </div>
+                <div class="accumulated_output_container">
+                    <div class="accumulated_output_text">
+                        Can you read this?
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</HTML>
