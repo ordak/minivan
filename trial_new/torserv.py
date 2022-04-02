@@ -1,17 +1,7 @@
 # TOODO
 #  -> add "changed" flags for all UI fields, esp. accumulated
-#  -> API:
-#        entry pages
-#          input-only window + full window
-#          sensor-level window
-#          input-only window (with input-output window open elsewhere)
-#        buttons
-#          cycleButtonFunction
-#          forceButtonAction
-#          getState
-#          static serving (jquery.js)
+#  -> make frontend pass button indeices not IDs
 
-import enum
 import queue
 import time
 import random
@@ -27,45 +17,18 @@ import asyncio
 import tornado.ioloop
 import tornado.web
 
+import buttonset
+import letterer
+
+the_button_set = buttonset.ButtonSet()
+the_letterer = letterer.Letterer()
+the_button_push_queue = queue.Queue()
+
+
 _DUMB_TEST = False
 _SEQUENTIAL_TEST = False
 _PREQUEUE_TEST = True
 
-class ButtonFunction(enum.IntEnum):
-    LEFT = 1
-    RIGHT = 2
-    GO = 3
-    SPACE = 4
-    BACKSPACE = 5
-    NOP = 6
-
-    def get_next(self):
-        for (testName, testObj), (succName, succObj) in \
-                itz.sliding_window(2,
-                        list(self.__class__.__members__.items()) * 2):
-            if testObj == self:
-                return succObj
-
-    def to_char(self):
-        if self == ButtonFunction.LEFT:
-            return '⇦' # '◀'
-        elif self == ButtonFunction.RIGHT:
-            return '⇨' # '▶'
-        elif self == ButtonFunction.GO:
-            return '↧' # '✔'
-        elif self == ButtonFunction.SPACE:
-            return '□ '
-        elif self == ButtonFunction.BACKSPACE:
-            return '⌫'''
-        elif self == ButtonFunction.NOP:
-            return '·'
-
-button_functions = {
-        1 : ButtonFunction.LEFT,
-        2 : ButtonFunction.RIGHT,
-        3 : ButtonFunction.GO,
-        4 : ButtonFunction.SPACE,
-        }
 
 class MainViewHandler(tornado.web.RequestHandler):
     def get(self):
@@ -81,85 +44,60 @@ class InputOnlyViewHandler(tornado.web.RequestHandler):
 
 class GetButtonFunctionsHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(json.dumps({
-            ei : button_functions[ei].to_char() for ei in button_functions
-            }))
+        button_chars_map = the_button_set.get_labelchars__index()
+        print(f'Here is map {button_chars_map}')
+        self.write(json.dumps(button_chars_map))
 
 class CycleButtonFunctionHandler(tornado.web.RequestHandler):
     def post(self):
-        #print(json.loads(self.request.body))
-        event_index = int(self.request.body[-1:])
-        print(self.request.body, event_index)
-        button_functions[event_index] = button_functions[event_index].get_next()
-        self.write(button_functions[event_index].to_char())
+        print('buttoncycle')
+        button_index = int(self.request.body[-1:])
+        print('button cycle {self.request.body}, {button_index}')
+        the_button_set.cycle_button_function(button_index)
+        self.write(the_button_set.get_labelchar(button_index))
 
 class ForceButtonActionHandler(tornado.web.RequestHandler):
     def post(self):
         #print(json.loads(self.request.body))
-        event_index = int(self.request.body[-1:])
-        print(self.request.body, event_index)
-        eventQueue.put(event_index)
+        button_index = int(self.request.body[-1:])
+        print(self.request.body, button_index)
+        the_button_push_queue.put(button_index)
 
-alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 01234567890'
-alphaIter = itz.sliding_window(5,
-    itertools.cycle(list(alphabet)))
-alphaSet = next(alphaIter)
-accumulated = "Wiggle"
+  # def EventsGenerator():
+  #     global the_button_set
+  #     global the_letterer
+  #     while True:
+  #         for eventInd in range(1, 5):
+  #             yield from [{
+  #                 "events" : [],
+  #                 "left_letters" : alphaSet[:2],
+  #                 "center_letter" : alphaSet[2],
+  #                 "right_letters" : alphaSet[3:],
+  #                 "accumulated" : accumulated,
+  #                 }] * 7
+  #             if random.random() > 0.8:
+  #                 accumulated += alphaSet[2];
+  #                 if random.random() > 0.8:
+  #                     accumulated += ' ';
+  #             alphaSet = next(alphaIter)
+  #             yield {
+  #                     "events" : [eventind],
+  #                     "left_letters" : alphaSet[:2],
+  #                     "center_letter" : alphaSet[2],
+  #                     "right_letters" : alphaSet[3:],
+  #                     "accumulated" : accumulated,
+  #                     }
+  # 
+  # eventGenerator = EventsGenerator()
 
-def EventsGenerator():
-    global accumulated
-    global alphaSet
-    while True:
-        for eventInd in range(1, 5):
-            yield from [{
-                "events" : [],
-                "left_letters" : alphaSet[:2],
-                "center_letter" : alphaSet[2],
-                "right_letters" : alphaSet[3:],
-                "accumulated" : accumulated,
-                }] * 7
-            if random.random() > 0.8:
-                accumulated += alphaSet[2];
-                if random.random() > 0.8:
-                    accumulated += ' ';
-            alphaSet = next(alphaIter)
-            yield {
-                    "events" : [eventind],
-                    "left_letters" : alphaSet[:2],
-                    "center_letter" : alphaSet[2],
-                    "right_letters" : alphaSet[3:],
-                    "accumulated" : accumulated,
-                    }
-
-eventGenerator = EventsGenerator()
-
-eventQueue = queue.Queue()
 if _PREQUEUE_TEST:
     def addPreQueue():
-        event_index = random.randint(1, 4)
-        print(f'putting {event_index}')
-        eventQueue.put(event_index)
+        button_index = random.randint(1, 4)
+        print(f'putting {button_index}')
+        the_button_push_queue.put(button_index)
 
     prequeueTestTimer = tornado.ioloop.PeriodicCallback(addPreQueue,  1000)
     prequeueTestTimer.start()
-
-def processEvent(event : ButtonFunction):
-    global accumulated
-    global alphaSet
-    if event == ButtonFunction.LEFT:
-        for _ in range(len(alphabet) - 1):
-            alphaSet = next(alphaIter)
-    elif event == ButtonFunction.RIGHT:
-        alphaSet = next(alphaIter)
-    elif event == ButtonFunction.GO:
-        accumulated += alphaSet[2]
-    elif event == ButtonFunction.SPACE:
-        accumulated += ' '
-    elif event == ButtonFunction.BACKSPACE:
-        if len(accumulated):
-            accumulated = accumulated[:-1]
-    elif event == ButtonFunction.NOP:
-        pass
 
 class GetStateHandler(tornado.web.RequestHandler):
     def get(self):
@@ -168,17 +106,18 @@ class GetStateHandler(tornado.web.RequestHandler):
         elif _DUMB_TEST:
             self.write(json.dumps({"fat": "yes"}))
         else:
-            events = list()
-            while not eventQueue.empty():
-                newEventIndex = eventQueue.get(block=False)
-                events.append(newEventIndex)
-                processEvent(ButtonFunction(button_functions[newEventIndex]))
+            pushed_button_indexes = list()
+            while not the_button_push_queue.empty():
+                pushed_button_index = the_button_push_queue.get(block=False)
+                pushed_button_indexes.append(pushed_button_index)
+                print(f'button {pushed_button_index} pushed')
+                the_button_set.act_on_letterer(pushed_button_index, the_letterer)
             self.write(json.dumps({
-                "events" : events,
-                "left_letters" : alphaSet[:2],
-                "center_letter" : alphaSet[2],
-                "right_letters" : alphaSet[3:],
-                "accumulated" : accumulated,
+                "events" : pushed_button_indexes,
+                "left_letters" : the_letterer.alphaset.get_left_letters(),
+                "center_letter" : the_letterer.alphaset.get_center_letter(),
+                "right_letters" : the_letterer.alphaset.get_right_letters(),
+                "accumulated" : the_letterer.get_accumulator(),
             }))
 
 
@@ -188,7 +127,7 @@ def make_app():
 
         # main app pages (views)
         (r"/", MainViewHandler),
-        (r"/inputOnly", InputViewHandler),
+        (r"/inputOnly", InputOnlyViewHandler),
         (r"/sensors", SensorsViewHandler),
 
         # dynamic operation endpoints

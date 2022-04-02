@@ -54,7 +54,7 @@ $(document).ready(function(){
     setInterval(() => {
         if (++synchroCounter >= synchroPeriod) {
             synchroCounter = 0;
-            $.get('/events', (data) => {
+            $.get('/getState', (data) => {
                 data = JSON.parse(data);
                 //console.log(data);
                 data.events.forEach( (ei) => {

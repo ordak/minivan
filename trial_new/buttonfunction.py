@@ -1,4 +1,5 @@
 import enum
+import toolz.itertoolz as itz
 
 class ButtonFunction(enum.IntEnum):
     LEFT = 1
@@ -15,7 +16,7 @@ class ButtonFunction(enum.IntEnum):
             if testObj == self:
                 return succObj
 
-    def to_char(self):
+    def to_labelchar(self):
         if self == ButtonFunction.LEFT:
             return '⇦' # '◀'
         elif self == ButtonFunction.RIGHT:
