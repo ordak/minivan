@@ -14,7 +14,7 @@ class Letterer:
     def __init__(self, sidelobe_size=2):
         self._alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 01234567890'
         self.alphaset = alphaset.AlphaSet(self._alphabet)
-        self._accumulator = "Wiggle"
+        self._accumulator = "..."
         self._alphaset_changed = True
         self._accumulator_changed = True
 
