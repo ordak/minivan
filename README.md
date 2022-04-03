@@ -27,7 +27,7 @@
         ```
   * To run locally (containerized) on Linux:
     ```
-    docker run -p 8888:8888 minivan:latest
+    docker run -p 8888:8888 wpgalle3/minivan:latest
     ```
   * Running on Windows
       * Install Docker on Windows [instructions](https://docs.docker.com/desktop/windows/install/)
