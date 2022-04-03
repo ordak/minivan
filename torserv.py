@@ -1,6 +1,9 @@
 # TOODO
 #  -> add "changed" flags for all UI fields, esp. accumulated
-#  -> make frontend pass button indeices not IDs
+#       [DONE] model in DSs
+#       pass in handlers
+#       utilize in JS
+#  -> make frontend pass button indices not IDs
 #  -> make events nonconsumable
 
 import queue
@@ -121,6 +124,11 @@ class GetStateHandler(tornado.web.RequestHandler):
                 "accumulated" : the_letterer.get_accumulator(),
             }))
 
+class GetSensorsStateHandler(tornado.web.RequestHandler):
+    def get(self):
+        rd = dict()
+        rd['test'] = [0, 1, 0, 1, 0]
+        self.write(json.dumps(rd))
 
 def make_app():
 
@@ -136,8 +144,11 @@ def make_app():
         (r"/cycleButtonFunction", CycleButtonFunctionHandler),
         (r"/forceButtonAction", ForceButtonActionHandler),
         (r"/getButtonFunctions", GetButtonFunctionsHandler),
+        (r"/getSensorsState", GetSensorsStateHandler),
 
         # misc endpoints
+        (r"/(favicon.ico)", 
+                tornado.web.StaticFileHandler, {"path": "static"}),
         (r"/static/(.*)",
                 tornado.web.StaticFileHandler, {"path": "static"}),
 
