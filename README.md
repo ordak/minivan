@@ -12,3 +12,4 @@ docker build . -t wpgalle3/minivan
 docker login --username wpgalle3 --password-stdin
 docker push wpgalle3/minivan
 ```
+  * To run container on Windows, you can follow instructions [here](https://docs.docker.com/desktop/windows/install/)
