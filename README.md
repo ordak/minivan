@@ -43,4 +43,5 @@
       * utilize in JS
   * make frontend pass button indices not IDs
   * make events nonconsumable
+  * propagate button func changes between windows
 

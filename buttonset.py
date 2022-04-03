@@ -2,7 +2,7 @@ from buttonfunction import ButtonFunction
 
 class ButtonSet:
 
-    def __init__(self, num_buttons=4):
+    def __init__(self, num_buttons=5):
         self._functions = dict()
         self._num_buttons = num_buttons
         self._load_default_functions()

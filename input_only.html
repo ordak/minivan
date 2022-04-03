@@ -33,12 +33,12 @@ $(document).ready(function(){
         }
     });
 
-    var eventIndicatorIntensities = [1.0, 1.0, 1.0, 1.0];
+    var eventIndicatorIntensities = [1.0, 1.0, 1.0, 1.0, 1.0];
     var eventIndicatorColors = [
-       [255, 0, 0], [255, 255, 0], [0, 180, 0], [0, 0, 255]];
+       [255, 0, 0], [255, 255, 0], [0, 180, 0], [0, 0, 255], [255, 0, 120]];
 
     var synchroCounter = 1;
-    var synchroPeriod = 3;
+    var synchroPeriod = 4;
     setInterval(() => {
         if (++synchroCounter >= synchroPeriod) {
             synchroCounter = 0;
@@ -52,11 +52,12 @@ $(document).ready(function(){
             });
         }
         eventIndicatorIntensities.forEach(  function(e, i, a) {
-            a[i] = Math.max(0.4, e * 0.95)
+            a[i] = Math.max(0.4, e * 0.95);
         });
-        $(".event_indicator").each(function(ei, e) {
-            e.style.background = crankUpAndDomizeColor(
-                eventIndicatorColors[ei], eventIndicatorIntensities[ei]);
+        eventIndicatorColors.forEach( function(e, ei) {
+            let newColor = crankUpAndDomizeColor(
+                    eventIndicatorColors[ei], eventIndicatorIntensities[ei]);
+            $("#event_" + (ei + 1)).css({backgroundColor : newColor});
         });
     }, 50);
 
@@ -79,7 +80,7 @@ $(document).ready(function(){
 .event_indicators_panel {
     display: grid;
     height: 90%;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
 .event_indicator {
     text-align: center;
@@ -106,17 +107,20 @@ $(document).ready(function(){
         </div>
         <div class="main_operating_area">
             <div class="event_indicators_panel">
-                <div class="event_indicator" id="event_1">
-                    1
+                <div class="event_indicator" id="event_5">
+                    5
                 </div>
-                <div class="event_indicator" id="event_2">
-                    2
+                <div class="event_indicator" id="event_4">
+                    4
                 </div>
                 <div class="event_indicator" id="event_3">
                     3
                 </div>
-                <div class="event_indicator" id="event_4">
-                    4
+                <div class="event_indicator" id="event_2">
+                    2
+                </div>
+                <div class="event_indicator" id="event_1">
+                    1
                 </div>
             </div>
         </div>
