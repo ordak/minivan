@@ -19,12 +19,13 @@ def main():
     print(f'Board ID {board.get_board_id()}')
     print(f'Board Descr {board.get_board_descr(1)}')
     board.start_stream(45000)
-    time.sleep(10)
+    time.sleep(3)
     # data = board.get_current_board_data (256) # get latest 256 packages or less, doesnt remove them from internal buffer
     data = board.get_board_data()  # get all data and remove it from internal buffer
-    print(len(data))
     board.stop_stream()
     board.release_session()
+    print(len(data))
+    print(data.size, data.shape)
 
 if __name__ == '__main__':
     main()
