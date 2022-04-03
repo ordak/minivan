@@ -1,0 +1,4 @@
+REPO=wpgalle3
+IMAGE=minivan
+docker build . -t ${REPO}/${IMAGE}:latest
+docker run -p 8888:8888 ${REPO}/${IMAGE}:latest

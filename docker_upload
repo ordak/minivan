@@ -1,0 +1,5 @@
+REPO=wpgalle3
+IMAGE=minivan
+docker build . -t ${REPO}/${IMAGE}:latest
+docker login
+docker push ${REPO}/${IMAGE}:latest
