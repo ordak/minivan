@@ -34,13 +34,15 @@ class ButtonSet:
     def _load_default_functions(self):
         for load_index in range(1, 1 + self._num_buttons):
             if load_index == 1:
-                self._functions[load_index] = ButtonFunction.LEFT
-            elif load_index == 2:
                 self._functions[load_index] = ButtonFunction.RIGHT
+            elif load_index == 2:
+                self._functions[load_index] = ButtonFunction.LEFT
             elif load_index == 3:
                 self._functions[load_index] = ButtonFunction.GO
             elif load_index == 4:
                 self._functions[load_index] = ButtonFunction.SPACE
+            elif load_index == 5:
+                self._functions[load_index] = ButtonFunction.BACKSPACE
             else:
                 self._functions[load_index] = ButtonFunction.NOP
         self._changed = True

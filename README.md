@@ -1,6 +1,7 @@
 # Running
 
   * Standard stuff:
+     * _(recommended to use virtualenv)_
     ```
     pip install -r requirements.txt
     python torserv.py
