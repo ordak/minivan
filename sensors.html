@@ -1,84 +1,15 @@
 <HTML>
     <head>
         <script src="static/jquery-3.6.0.min.js"></script>
+        <script src="static/d3.min.js"></script>
+        <script src="static/util.js"></script>
     <script>
+
 $(document).ready(function(){
-
-    fancizeSpace = function(c) { return c == ' ' ? '□ ' : c; };
-    crankUpAndDomizeColor = function(baseColor, crankFactor) {
-        overflowFactor = crankFactor > 1 ? crankFactor - 1 : 0;
-        overflowFactor = crankFactor;
-        return "rgb(" + (baseColor[0] * crankFactor + overflowFactor * 40) + 
-                  "," + (baseColor[1] * crankFactor + overflowFactor * 40) + 
-                  "," + (baseColor[2] * crankFactor + overflowFactor * 40) + 
-                  ")";
-    }
-
-    $.get('/getButtonFunctions', (data) => {
+    $.get('/getSensorsState', (data) => {
         data = JSON.parse(data);
         console.log(data);
-        for (const [ei, ch] of Object.entries(data)) {
-            $("#event_" + ei).text(ch);
-        };
     });
-
-    $(".event_indicator").click( function(e) {
-        element = $(this);
-        if (e.shiftKey) {  // shift click
-            console.log(e);
-            let element = $(this);
-            console.log(element.attr("id"));
-            $.post("/cycleButtonFunction",
-            { "event_index": element.attr("id").replaceAll(/^event_/g, "") }
-            ).done(function(result) {
-                // data = JSON.parse(result);
-                console.log(result);
-                element.text(result); });
-        } else {
-            $.post("/forceButtonAction",
-            { "event_index": element.attr("id").replaceAll(/^event_/g, "") }
-            );
-        }
-    });
-
-    $(".large_letter").click( () => {
-        $(".large_letter").text("X");
-    });
-
-    var eventIndicatorIntensities = [1.0, 1.0, 1.0, 1.0];
-    var eventIndicatorColors = [
-       [255, 0, 0], [255, 255, 0], [0, 180, 0], [0, 0, 255]];
-
-    var synchroCounter = 1;
-    var synchroPeriod = 3;
-    setInterval(() => {
-        if (++synchroCounter >= synchroPeriod) {
-            synchroCounter = 0;
-            $.get('/getState', (data) => {
-                data = JSON.parse(data);
-                //console.log(data);
-                data.events.forEach( (ei) => {
-                    console.log("Event " + ei);
-                    // ei - 1 since events are 1-based
-                    eventIndicatorIntensities[ei - 1] = 1.5; });
-                $(".large_letter").text(fancizeSpace(data.center_letter));
-                $(".small_letter#L1").text(fancizeSpace(data.left_letters[0]));
-                $(".small_letter#L2").text(fancizeSpace(data.left_letters[1]));
-                $(".small_letter#R1").text(fancizeSpace(data.right_letters[0]));
-                $(".small_letter#R2").text(fancizeSpace(data.right_letters[1]));
-                $(".accumulated_output_text").text(data.accumulated + "▒");
-                $(".accumulated_output_container").scrollTop(
-                    $(".accumulated_output_text").height());
-            });
-        }
-        eventIndicatorIntensities.forEach(  function(e, i, a) {
-            a[i] = Math.max(0.4, e * 0.95)
-        });
-        $(".event_indicator").each(function(ei, e) {
-            e.style.background = crankUpAndDomizeColor(
-                eventIndicatorColors[ei], eventIndicatorIntensities[ei]);
-        });
-    }, 50);
 
 }); 
         </script>
@@ -164,32 +95,18 @@ $(document).ready(function(){
         <div class="navbar">
         </div>
         <div class="main_operating_area">
-            <div class="event_indicators_panel">
-                <div class="event_indicator" id="event_1">
+            <div class="channel_signals_area">
+                <div class="channel_signal" id="channel_1">
                     1
                 </div>
-                <div class="event_indicator" id="event_2">
+                <div class="channel_signal" id="channel_2">
                     2
                 </div>
-                <div class="event_indicator" id="event_3">
+                <div class="channel_signal" id="channel_3">
                     3
                 </div>
-                <div class="event_indicator" id="event_4">
+                <div class="channel_signal" id="channel_4">
                     4
-                </div>
-            </div>
-            <div class="output_area">
-                <div class="current_output">
-                    <div class="small_letter" id="L1">A</div>
-                    <div class="small_letter" id="L2">B</div>
-                    <div class="large_letter">C</div>
-                    <div class="small_letter" id="R1">D</div>
-                    <div class="small_letter" id="R2">E</div>
-                </div>
-                <div class="accumulated_output_container">
-                    <div class="accumulated_output_text">
-                        Can you read this?
-                    </div>
                 </div>
             </div>
         </div>
