@@ -1,11 +1,3 @@
-# TOODO
-#  -> add "changed" flags for all UI fields, esp. accumulated
-#       [DONE] model in DSs
-#       pass in handlers
-#       utilize in JS
-#  -> make frontend pass button indices not IDs
-#  -> make events nonconsumable
-
 import queue
 import time
 import random
