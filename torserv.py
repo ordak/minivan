@@ -6,9 +6,12 @@ import itertools
 import json
 
 import brainflow
-from brainflow.board_shim import BoardShim, BrainFlowInputParams
+from brainflow.board_shim import BoardShim
+from brainflow.board_shim import BrainFlowInputParams
 from brainflow.board_shim import BoardIds
-from brainflow.data_filter import DataFilter, FilterTypes, AggOperations
+from brainflow.data_filter import DataFilter
+from brainflow.data_filter import FilterTypes
+from brainflow.data_filter import AggOperations
 import asyncio
 import tornado.ioloop
 import tornado.web

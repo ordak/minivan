@@ -1,3 +1,5 @@
-brainflow==4.9.1
-toolz==0.11.2
-tornado==6.1
+brainflow
+toolz
+tornado
+numpy
+npytyping=1.4.4  # some weirdness with 2.0.0 & brainflow 4.9.1
