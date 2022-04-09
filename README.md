@@ -32,15 +32,9 @@
   * Running on Windows
       * Install Docker on Windows [instructions](https://docs.docker.com/desktop/windows/install/)
       * To run container on Windows: (in Terminal):
-        ```
-        docker pull wpgalle3/minivan:latest
-        docker run --name minivan -p 8888:8888 wpgalle3/minivan:latest
-        ```
-      * To stop container on Windows: (in Terminal):
-        ```
-        docker stop minivan
-        docker rm minivan
-        ```
+    ```
+    docker run -p 8888:8888 wpgalle3/minivan:latest
+    ```
 # Backlog
 
   * add "changed" flags for all UI fields, esp. accumulated
