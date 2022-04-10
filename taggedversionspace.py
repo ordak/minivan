@@ -1,3 +1,4 @@
+from taggedversionstate import TaggedVersionState
 from toolz import dicttoolz as dtz
 import functools
 
@@ -5,7 +6,10 @@ class TaggedVersionedSpace:
     def __init__(self, *args):
         self._constituents__tag = dict()
         for constituent in *args:
-            self.addConstituent(constituent.get_tag(), constituent)
+            self.add(constituent.get_tag(), constituent)
+
+    def add(self, tag, constituent: TaggedVersionState):
+        self._constituents__tag[tag] = constituent
 
     def get_latest_versions(self):
         return dtz.valmap(
